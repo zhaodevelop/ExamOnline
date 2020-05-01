@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruanyuan.mapper.UserMapper">
+
+
+	<!-- 添加用户信息 -->
+	<!--SQL片段 -->
+	<sql id="key">
+		<trim suffixOverrides=",">
+			<!-- 当性别不为空时 -->
+			<if test="sex!=null">
+				sex,
+			</if>
+			<!-- 当电话不为空时 -->
+			<if test="phone!=null">
+				phone,
+			</if>
+			<!-- 当地址不为空时 -->
+			<if test="address!=null">
+				address,
+			</if>
+			<!-- 当邮箱不为空时 -->
+			<if test="email!=null">
+				email,
+			</if>
+			<!-- 当头像不为空时 -->
+			<if test="headImg!=null">
+				headImg,
+			</if>
+		</trim>
+	</sql>
+	<!--SQL片段 -->
+	<sql id="value">
+		<trim suffixOverrides=",">
+			<!--当性别不为空时 -->
+			<if test="sex!=null">
+				#{sex},
+			</if>
+			<!--当电话不为空时 -->
+			<if test="phone!=null">
+				#{phone},
+			</if>
+			<!--当地址不为空时 -->
+			<if test="address!=null">
+				#{address},
+			</if>
+			<!--当邮箱不为空时 -->
+			<if test="email!=null">
+				#{email},
+			</if>
+			<!--当头像不为空时 -->
+			<if test="headImg!=null">
+				#{headImg},
+			</if>
+		</trim>
+	</sql>
+	<!-- 添加用户方法 -->
+	<insert id="addUser" parameterType="user">
+		insert into user(userName,account,passWord,
+		<include refid="key"></include>
+		,userRoleId) values
+		(#{userName},#{account},#{passWord},
+		<include refid="value"></include>
+		,#{role.roleId})
+	</insert>
+	<!-- 根据用户id删除用户信息 -->
+	<delete id="deleteUserById" parameterType="Integer">
+		delete from user where
+		userId= #{userId}
+	</delete>
+	<!-- 根据用户id修改用户信息 -->
+	<update id="updateUserById" parameterType="user">
+		update user
+		<set>
+			<!--当用户姓名不为空时 -->
+			<if test="userName!=null and userName!=''">
+				userName = #{userName},
+			</if>
+			<!--当用户账号不为空时 -->
+			<if test="account !=null and account!=''">
+				Account = #{account},
+			</if>
+			<!--当用户密码不为空时 -->
+			<if test="passWord !=null and passWord!=''">
+				passWord = #{passWord},
+			</if>
+			<!--当用户性别不为空时 -->
+			<if test="sex !=null and sex!=''">
+				sex =#{sex},
+			</if>
+			<!--当用户电话不为空时 -->
+			<if test="phone !=null ">
+				phone = #{phone},
+			</if>
+			<!--当用户地址不为空时 -->
+			<if test="address !=null ">
+				address = #{address},
+			</if>
+			<!--当用户头像不为空时 -->
+			<if test="headImg != null and headImg!=''">
+				headImg = #{headImg},
+			</if>
+			<!--当用户邮箱不为空时 -->
+			<if test="email != null">
+				email = #{email},
+			</if>
+			<!--当用户角色不为空时 -->
+			<if test="role !=null">
+				userRoleId = #{role.roleId}
+			</if>
+		</set>
+		where userId = #{userId}
+	</update>
+	<!-- 根据用户id查询用户信息 嵌套结果 -->
+	<select id="getUserById" parameterType="Integer"
+		resultMap="getUser">
+		select user.*,role.* from user,role where user.userRoleId =
+		role.roleId and
+		user.userId = #{userId}
+	</select>
+	<resultMap type="user" id="getUser">
+		<id property="userId" column="userId" />
+		<result property="userName" column="userName" />
+		<result property="account" column="Account" />
+		<result property="passWord" column="passWord" />
+		<result property="sex" column="sex" />
+		<result property="phone" column="phone" />
+		<result property="address" column="address" />
+		<result property="email" column="email" />
+		<result property="headImg" column="Headimg" />
+		<association property="role" javaType="role">
+			<id property="roleId" column="roleId" />
+			<result property="roleName" column="roleName" />
+		</association>
+	</resultMap>
+	<!-- 根据角色id查询用户信息 -->
+	<select id="getUserByRoleId" parameterType="Integer"
+		resultMap="getUser">
+		select user.*,role.* from user,role where user.userRoleId =
+		role.roleId and user.userRoleId = #{roleId}
+	</select>
+	<!-- 根据角色id删除用户信息 -->
+	<delete id="deleteUserByRoleId" parameterType="Integer">
+		delete from user
+		where
+		userRoleId= #{roleId}
+	</delete>
+	<!-- 根据用户名模糊查询用户信息 -->
+	<select id="getUserByNames" parameterType="user"
+		resultMap="getUser">
+		select user.*,role.* from user,role where user.userRoleId =
+		role.roleId and user.userName like concat('%',#{userName},'%')
+	</select>
+	<!-- 根据姓名查询用户信息 -->
+	<select parameterType="String" id="selectUserByName"
+		resultMap="getUser">
+		select user.*,role.* from user,role
+		<where>
+			user.userRoleId = role.roleId and role.roleId = 1
+			<if test="userName !=null and userName !=''">and user.userName =#{userName} </if>
+		</where>
+	</select>
+	<!-- 根据角色账号查询角色信息 -->
+	<select id="getUserByAccountAndPassWord" parameterType="String"
+		resultMap="getUser">
+		select u.*,r.* from user u,role r where
+		account=#{account}
+		and passWord=#{passWord} and u.userRoleId = r.roleId
+	</select>
+	<!-- 根据用户id修个人中心信息 -->
+	<update id="updateUserById1" parameterType="user">
+		update user
+		<set>
+			<if test="userName!=null and userName!=''">
+				userName = #{userName},
+			</if>
+			<if test="account !=null and account!=''">
+				Account = #{account},
+			</if>
+			<if test="passWord !=null and passWord!=''">
+				passWord = #{passWord},
+			</if>
+			<if test="sex !=null and sex!=''">
+				sex =#{sex},
+			</if>
+			<if test="phone !=null and phone!=''">
+				phone = #{phone},
+			</if>
+			<if test="address !=null and address!=''">
+				address = #{address},
+			</if>
+			<if test="headImg != null and headImg!=''">
+				headImg = #{headImg},
+			</if>
+			<if test="email != null and email != ''">
+				email = #{email},
+			</if>
+		</set>
+		where userId = #{userId}
+	</update>
+	<!-- excel批量上传批量插入 -->
+	<insert id="insertUserBatch" parameterType="java.util.List">
+		insert into user (
+		userName,account,passWord,sex,phone,address,email,userRoleId
+		)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.userName},#{item.account},#{item.passWord},#{item.sex},#{item.phone},#{item.address},
+			#{item.email},#{item.role.roleId}
+			)
+		</foreach>
+	</insert>
+
+
+	<!--分页多条件查询用户信息 -->
+	<select id="getAllUsers" resultMap="userAndrole">
+		select userId,userName,account,sex,phone,address,email,r.roleName from
+		user
+		u inner join role r on u.userRoleId=r.roleId
+		<where>
+			<!--当用户姓名不为空时 -->
+			<if test="userName!=null and userName!=''">
+				and userName like concat('%',#{userName},'%')
+			</if>
+			<!--当用户账号不为空时 -->
+			<if test="account !=null and account!=''">
+				and Account like concat('%',#{account},'%')
+			</if>
+			<!--当用户角色不为空时 -->
+			<if test="roleId!=null and roleId!=''">
+				and userRoleId = #{roleId}
+			</if>
+		</where>
+		<!--当起始行，所取行数不为空时 -->
+		<if test="start !=null and rows != null">
+			limit #{start},#{rows}
+		</if>
+	</select>
+	<resultMap type="user" id="userAndrole">
+		<id property="userId" column="userId" />
+		<result property="userName" column="userName" />
+		<result property="account" column="Account" />
+		<result property="passWord" column="passWord" />
+		<result property="sex" column="sex" />
+		<result property="phone" column="phone" />
+		<result property="address" column="address" />
+		<result property="email" column="email" />
+		<result property="headImg" column="Headimg" />
+		<association property="role" javaType="role">
+			<id property="roleId" column="roleId" />
+			<result property="roleName" column="roleName" />
+		</association>
+	</resultMap>
+	<!-- 验证账号是否唯一 -->
+	<select id="testAccount" parameterType="String"
+		resultType="user">
+		select * from user where account=#{account};
+	</select>
+	<!-- 查询用户数量 -->
+	<select id="getUserNum" parameterType="user" resultType="int">
+		select
+		count(*) from user
+		<where>
+			<!--当用户姓名不为空时 -->
+			<if test="userName!=null and userName!=''">
+				and userName like concat('%',#{userName},'%')
+			</if>
+			<!--当用户账号不为空时 -->
+			<if test="account !=null and account!=''">
+				and Account like concat('%',#{account},'%')
+			</if>
+			<!--当角色不为空时 -->
+			<if test="roleId!=null and roleId!=''">
+				and userRoleId = #{roleId}
+			</if>
+		</where>
+	</select>
+	<!-- 批量删除用户信息 -->
+	<select id="deleteMoreUser" parameterType="list">
+		delete from user where userId in
+		<foreach collection="list" index="index" open="("
+			separator="," close=")" item="userId">
+			#{userId}
+		</foreach>
+	</select>
+	<!-- 根据用户名模糊查询用户信息 -->
+	<select id="getLikeUserName" parameterType="String"
+		resultType="user">
+		select * from user where userName like
+		CONCAT('%',#{userName},'%')
+	</select>
+	<!-- 根据登录账号查询用户信息 -->
+	<select id="getInfoByAccount" parameterType="String"
+		resultType="user">
+		select * from user where account=#{account}
+	</select>
+	<!-- 根据用户id查询用户信息 -->
+	<select id="getUser" parameterType="int" resultType="user">
+		select *
+		from user where userId=#{userId}
+	</select>
+</mapper>

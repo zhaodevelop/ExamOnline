@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruanyuan.mapper.FieldMapper">
+	<!--SQL片段 -->
+	<sql id="selectFieldListWhere">
+		<where>
+			<!-- 当行业名称不为空时 -->
+			<if test="fieldName !=null and fieldName != ''">
+				and fieldName like concat('%',#{fieldName},'%')
+			</if>
+			<!-- 当行业介绍不为空时 -->
+			<if test="introduce !=null and introduce != ''">
+				and introduce like concat('%',#{introduce},'%')
+			</if>
+		</where>
+	</sql>
+	<!-- 添加行业信息 -->
+	<insert id="addField" parameterType="field">
+		insert into field values
+		(null,#{fieldName},#{introduce})
+	</insert>
+	<!-- 根据行业id删除行业信息 -->
+	<delete id="deleteFieldById" parameterType="Integer">
+		delete from field
+		where fieldId = #{fieldId}
+	</delete>
+	<!-- 根据行业id修改行业信息 -->
+	<update id="updateFieldById" parameterType="field">
+		update field
+		<set>
+			<!-- 当行业名称不为空时 -->
+			<if test="fieldName !=null and fieldName !=''">
+				fieldName = #{fieldName},
+			</if>
+			<!-- 当行业介绍不为空时 -->
+			<if test="introduce !=null and introduce !=''">
+				introduce = #{introduce}
+			</if>
+		</set>
+		where fieldId = #{fieldId}
+	</update>
+	<!-- 查询所有行业 -->
+	<select id="getFields" parameterType="Integer"
+		resultType="field">
+		select * from field
+	</select>
+	<!-- 分页查询行业信息 -->
+	<select id="getFieldByPage" parameterType="field"
+		resultType="field">
+		select * from field
+		<include refid="selectFieldListWhere" />
+		<if test="startLine!=null and rows!=null">
+			limit #{startLine},#{rows}
+		</if>
+	</select>
+	<!-- 获取行业总数 -->
+	<select id="getFieldCount" parameterType="field"
+		resultType="int">
+		select count(*) from field
+		<include refid="selectFieldListWhere" />
+	</select>
+	<!-- 根据行业名称查询行业信息 -->
+	<select id="getFieldByFieldName" parameterType="String"
+		resultType="field">
+		select * from field where fieldName = #{fieldName}
+	</select>
+	<!-- 批量删除行业信息 -->
+	<delete id="deleteFieldByIds">
+		delete from field where fieldId in
+		<foreach collection="list" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	<!-- 根据行业id查询行业信息 -->
+	<select id="getFieldById" parameterType="Integer"
+		resultMap="fieldMap">
+		select * from field where fieldId = #{fieldId}
+	</select>
+	<!-- 获取所有行业信息 -->
+	<select id="getAllField" resultMap="fieldMap">
+		select * from field
+	</select>
+	<!-- 所需字段与属性映射 -->
+	<resultMap type="field" id="fieldMap">
+		<id property="fieldId" column="fieldId" />
+		<collection property="courseList" ofType="Course"
+			column="fieldId"
+			select="com.ruanyuan.mapper.CourseMapper.getCourseByFieldId">
+		</collection>
+	</resultMap>
+</mapper>

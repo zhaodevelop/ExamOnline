@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 命名空间-包名+映射文件名 -->
+<mapper namespace="com.ruanyuan.mapper.JournalMapper">
+	<!-- 登录日志：添加信息 -->
+	<insert id="addJournal" parameterType="journal"
+		useGeneratedKeys="true" keyProperty="jId">
+		INSERT INTO
+		Journal(userId,jTime,ip) VALUES (#{user.userId},#{jTime},#{ip})
+	</insert>
+	<!-- 登录日志：修改信息 -->
+	<update id="updateJournal" parameterType="journal">
+		UPDATE Journal set
+		userId=#{user.userId},jTime=#{jTime},ip=#{ip} WHERE
+		jId=#{jId}
+	</update>
+	<!-- 登录日志：删除信息 -->
+	<delete id="deletejournal" parameterType="int">
+		DELETE FROM Journal
+		WHERE jId=#{jId}
+	</delete>
+	<!-- 登录日志：查询信息 -->
+	<select id="getJournalById" resultType="journal">
+		SELECT * FROM Journal
+		WHERE jId=#{jId}
+	</select>
+	<!-- 登录日志：导出用户所有 -->
+	<select id="getJournalByUser" resultType="Middlej">
+		select
+		journal.*,user.userName,role.roleName from journal
+		LEFT JOIN user ON
+		user.userId=journal.userId
+		JOIN role ON user.userRoleId =
+		role.roleId
+	</select>
+	<!-- 查询登录日志总数 -->
+	<select id="getjournalCount" resultType="Integer">
+		select count(*) from journal 
+		LEFT JOIN
+		user ON user.userId=journal.userId
+		JOIN role ON user.userRoleId =
+		role.roleId
+		<where>
+			<choose>
+				<when
+					test="startTime !=null and startTime!='' and endTime !=null and endTime!=''">
+					jTime BETWEEN #{startTime} AND #{endTime}
+				</when>
+				<when test="startTime !=null and startTime!='' ">
+					jTime  <![CDATA[>=]]>#{startTime}
+				</when>
+
+				<when test="endTime !=null and endTime!=''">
+					jTime  <![CDATA[<=]]>#{endTime}
+				</when>
+			</choose>
+			<if test="userName!='' and userName !=null ">
+				and user.userName LIKE concat('%',#{userName},'%') </if>
+			<if test="rank!='' and rank !=null ">
+				and role.roleName = #{rank}
+			</if>
+		</where>
+	</select>
+	<!-- 批量删除试卷信息 -->
+	<delete id="deletejournals" parameterType="list">
+		DELETE FROM journal WHERE jid in
+		<foreach collection="list" item="jid" open="(" close=")"
+			separator=",">
+			#{jid}
+		</foreach>
+	</delete>
+	<!-- 分页多条件查询信息 -->
+	<select id="getJournals" resultType="Middlej">
+		select journal.*,user.userName,role.roleName from journal
+		LEFT JOIN
+		user ON user.userId=journal.userId
+		JOIN role ON user.userRoleId =
+		role.roleId 
+		<where>
+			<choose>
+				<when
+					test="startTime !=null and startTime!='' and endTime !=null and endTime!=''">
+					jTime BETWEEN #{startTime} AND #{endTime} 
+				</when>
+				<when test="startTime !=null and startTime!='' ">
+					jTime  <![CDATA[>=]]>#{startTime} 
+				</when>
+				<when test="endTime !=null and endTime!=''">
+					jTime  <![CDATA[<=]]>#{endTime} 
+				</when>
+			</choose>
+			<if test="userName!='' and userName !=null ">
+				and user.userName LIKE concat('%',#{userName},'%') </if>
+			<if test="rank!='' and rank !=null ">
+				and role.roleName = #{rank} 
+			</if>
+		</where>
+		ORDER BY jtime DESC
+		<if test="start !=null and rows !=null">
+			limit #{start},#{rows} 
+		</if>
+		
+	</select>
+
+
+</mapper>

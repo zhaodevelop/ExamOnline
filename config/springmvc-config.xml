@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+         http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+      <!--注解扫描-->					
+      <context:component-scan base-package="com.ruanyuan.controller"/>
+      
+       <!-- 配置注解驱动 会提供读写xml和json的功能-->
+      <mvc:annotation-driven />
+      
+      <!-- 定义视图解析器 -->
+      <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" 
+            id="internalResourceViewResolver">
+        <!-- 前缀 -->
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <!-- 后缀 -->
+        <property name="suffix" value=".jsp" /> 
+      </bean>
+	    <mvc:default-servlet-handler/>
+	    <!--静态资源默认servlet配置-->
+	    <mvc:resources location="/css/" mapping="/css/**"></mvc:resources>
+	    <mvc:resources location="/js/" mapping="/js/**"></mvc:resources>
+	    <mvc:resources location="/images/" mapping="/images/**"/>
+	    <mvc:resources location="/fonts/" mapping="/fonts/**"/>
+	    <mvc:resources location="/layui/" mapping="/layui/**"/>
+	    <mvc:resources location="/file/" mapping="/file/**"/>
+	   <!-- 定义文件上传解析器 -->
+		<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 设定默认编码 -->
+		<property value="UTF-8" name="defaultEncoding"/>
+		<property value="1048576" name="maxUploadSize"/>
+		</bean>
+	<!-- 配置拦截器 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<!-- 拦截所有mvc控制器 -->
+			<mvc:mapping path="/**"/>
+			<!-- mvc:exclude-mapping是另外一种拦截，它可以在你后来的测试中对某个页面进行不拦截，这样就不用在 LoginInterceptor的preHandler方法里面获取不拦截的请求uri地址了(优选) -->
+			<bean class="com.ruanyuan.interceptor.LoginInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
+</beans>

@@ -1,0 +1,337 @@
+@charset "utf-8";
+/* CSS Document */
+
+.content{
+	min-width:1200px;
+	margin-left:7%;
+	width:93%;
+	overflow:hidden;
+	}
+.left_list{
+	float:left;
+	margin-left:10px;
+	border:#999 1px solid;
+	width:13%;
+	}
+.cz_title{
+	width:100%;
+	font-size:14px;
+	font-weight: bold;
+	background: url(../images/seckill_hd.png) -30px no-repeat;
+	padding-top:12px;
+	color:#FFF;
+	padding-bottom:12px;
+	}
+.cz_title span{
+	margin-left:10px;
+	}
+.cz_nr{
+	width:100%;
+	font-size:14px;
+	padding-top:12px;
+	padding-bottom:12px;
+	text-align:center;
+	border-bottom:#999 1px solid;
+	}
+.right_list{
+	width:80%;
+	height:520px;
+	float:left;
+	margin-left:20px;
+	}
+.right_title,.right_select{
+	width:95%;
+	font-size:14px;
+	font-weight:bold;
+	margin-left:10px;
+	padding-top:5px;
+	height:20px;
+	}
+.right_select .select{
+	float:right;
+	}
+.right_table{
+	width:96%;
+	margin-top:10px;
+	} 
+.right_table table{
+    width: 100%;
+}
+.right_table table{
+	width: 100%;
+    border-top: 1px solid #c60000;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+	} 
+.right_table table th {
+    background: #f3f3f3;
+    padding: 10px;
+    text-align: center;
+	border-left: 1px #CCC solid;
+    border-right: 1px #CCC solid;
+    font-weight: bold;
+    border-bottom: 1px solid #CCC;
+}
+
+.right_table table td {
+    background: #f3f3f3;
+    padding: 15px;
+	text-align:center;
+	border: 1px #CCC solid;
+}
+.right_info{
+	width:40%;
+	height:35px;
+	margin-top:10px;
+	margin-left:10px;
+	}
+.right_info_titel{
+	float:left;
+	text-align:right;
+	padding:10px 0 5px 0;
+	width:30%;
+	font-weight:bold;
+	}
+.right_info_cont{
+	float:left;
+	text-align:left;
+	margin-left:5px;
+	padding:5px 0 5px 0;
+	}
+ input[type=submit]{
+    float: left;
+    padding: 5px 18px;
+    margin-top: 6px;
+    display: block;
+    overflow: hidden;
+    color: #fff;
+    background-color: #C60000;
+    border: 1px solid #b90000;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.input{
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 5px 10px 5px 5px;
+    width: 150px;
+}
+
+.reveal-modal-bg{
+	position:fixed;
+	height:100%;
+	width:100%;
+	background-color:#000;
+	z-index:100;
+	display:none;
+	top:0;
+	left:0;
+}
+.reveal-modal{
+	visibility:hidden;
+	top:100px;
+	left:50%;
+	margin-left:-300px;
+	width:420px;
+	background:#eee url(modal-gloss.png) no-repeat -200px -80px;
+	position:absolute;
+	z-index:101;
+	padding:30px 40px 34px;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+	-moz-box-shadow:0 0 10px rgba(0,0,0,.4);
+	-webkit-box-shadow:0 0 10px rgba(0,0,0,.4);
+	-box-shadow:0 0 10px rgba(0,0,0,.4);
+}
+.reveal-modal .close-reveal-modal {
+	font-size:22px;
+	line-height:.5;
+	position:absolute;
+	top:8px;
+	right:11px;
+	color:#aaa;text-shadow:0 -1px 1px rbga(0,0,0,.6);
+	font-weight:bold;cursor:pointer;
+} 
+.reveal-modal h2{
+	font-size:18px;
+	color:#990000;
+}
+.addtable td{
+	padding:5px 0 5px 0;
+	}
+.sh_left{
+	width:40%;
+	height:90%;
+	float:left;
+	margin-top:15px;
+	margin-left:6%;
+	}
+.sh_right{
+    width:40%;
+	height:85%;
+	float:left;
+	margin-top:15px;
+	margin-left:6%;
+	min-width: 400px;
+	max-width:400px;
+	}
+.sh_left .sh_title,.sh_right .sh_title{
+	width:100%;
+	color:#FFF;
+	font-size:14px;
+	background:url(../images/seckill_hd.png) -20px no-repeat;
+	font-weight:bold;
+	border:1px #C60000 solid;
+	padding-top:5px;
+	padding-bottom:5px;
+	}
+.sh_left .sh_title span,.sh_right .sh_title span{
+	margin-left:10px;
+	}
+.sh_left .sh_content{
+	width:100%;
+	height:88%;
+	margin:0 auto;
+    font-size:14px;
+	font-weight:bold;
+	text-align:center;
+	}
+.sh_left .sh_content table{
+	width:100%;
+	background-color:#f6f6f6;
+	border-collapse: collapse;
+	}
+.sh_left .sh_content td{
+	text-align:right;
+    border: 1px solid #999;
+	}
+.sh_content td input[type=text]{
+	border: 1px solid #666;
+    border-radius: 3px;
+    padding: 5px 10px 5px 5px;
+    font-size: 12px;
+    width: 65%;
+	}
+.sh_content td select{
+	border: 1px solid #666;
+    border-radius: 3px;
+    padding: 5px 10px 5px 5px;
+    font-size: 12px;
+    width: 65%;
+	}
+.sh_content td textarea {
+    border: 1px solid #e6e6e6;
+    padding: 5px;
+    height: 100px;
+    width: 80%;
+    border-radius:5px;
+}
+input[type=submit]{
+    float: right;
+    padding: 5px 20px;
+    margin-top: 5px;
+	margin-bottom:5px;
+    display: block;
+    overflow: hidden;
+    color: #fff;
+    background-color: #C60000;
+    border: 1px solid #b90000;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.sh_right .sh_content{
+	width:100%;
+	border:#CCC 1px solid;
+	height:47%;
+	margin:0 auto;
+    font-size:14px;
+	text-align:center;
+	line-height:20px;
+	background-color:#f6f6f6;
+	}
+.sh_right .sh_content2{
+	width:100%;
+	height:34%;
+	margin:0 auto;
+    font-size:14px;
+	text-align:center;
+	line-height:20px;
+	background-color:#f6f6f6;
+	border: 1px solid #CCC;
+	}
+ .piece_num {
+    display: inline-block;
+    padding: 0 10px;
+    font-size: 14px;
+}
+.totalMoney{
+	float: left;
+    min-width: 100px;
+	height:100%;
+    line-height: 50px;
+	}
+.buzhou{
+	width:49%;
+	height:82%;
+	float:right;
+	font-size:12px;
+	}
+.buzhou .buzhou1,.buzhou .buzhou2,.buzhou .buzhou3{
+	float:left;
+	color:#FFF;
+	height:100%;
+	width:32%;
+	text-align:center;
+	padding-top:8px;
+	cursor:pointer;
+	}
+.bg_this{
+	background:url(../images/jiantou.png) no-repeat;
+	
+	background-size:100% 100%;
+
+	}
+.bg_other{
+	background:url(../images/jiantou2.png) no-repeat;
+	background-size:100% 100%;
+	}
+.left_tit{
+	width:100%;
+	height:55px;
+	}
+.left_tit .tit_emg{
+	height:55px;
+	width:55px;
+	float:left;
+	}
+.left_tit .tit_cont{
+	float:left;
+	font-size:16px;
+	font-weight:bold;
+	text-align:center;
+	padding-top:20px;
+	padding-bottom:20px;
+	padding-left:20px;
+	}
+.left_she{
+	width:100%;
+	height:326px;
+	margin-top:20px;
+	border:#CCC 1px solid;
+	border-radius:8px;
+	}
+.left_she2{
+	width:100%;
+	height:326px;
+	margin-top:20px;
+	font-weight:bold;
+	font-size:14px;
+	padding-left:20px;	
+	}
+.left_she li {
+	padding-top:20px;
+	font-size:14px;
+	padding-left:40px;
+	}

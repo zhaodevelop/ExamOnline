@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruanyuan.mapper.ItemPaperMapper">
+	
+	 <!--根据题库ID查找中间关系表-->
+	<select id="getItemPaperByItemBankId" parameterType="Integer" resultMap="ItemPaperByItemBankId">
+		select * from ItemPaper where
+		ibId in <foreach close=")" separator="," open="(" index="index" item="id" collection="ids">#{id} </foreach>
+	</select>
+	<!-- 多条件分页查询所需字段与属性映射 -->
+	<resultMap type="ItemPaper" id="ItemPaperByItemBankId">
+		<id  property="id" column="id"/>
+		<association property="itemBank" javaType="ItemBank" column="ibId" 
+			select="com.ruanyuan.mapper.ItemBankMapper.getItemBankByPaperId">
+		</association>
+	</resultMap>
+	
+	<!--根据题库ID批量删除关系表数据-->
+	<delete id="deleteItemPaperByItemBankId"  parameterType="list" >
+		delete  from ItemPaper where ibId in 
+		<!--使用foreach批量删除-->
+		<foreach close=")" separator="," open="(" index="index" item="id" collection="ids">#{id} </foreach>
+	</delete>
+	<!-- 添加中间表信息 -->
+	<insert parameterType="Integer" id="addItemPaper">
+	insert into itempaper values 
+	<foreach separator="," collection="ibIds" item="ibId">(null,#{ibId},#{tpId}) </foreach>
+
+	</insert>
+	<!-- 根据试卷id删除中间表信息 -->
+	<delete parameterType="Integer" id="deleteItemPaperBytpId">
+		delete from itempaper where tpId = #{tpId} </delete>
+	<!-- 根据试卷id批量删除中间表信息 -->
+	<delete parameterType="Integer" id="deleteItemPaperBytpIds">
+		delete from itempaper where tpId in 
+	<foreach separator="," collection="tpIds" item="tpId" close=")" open="(">
+	#{tpId} </foreach>
+
+	</delete>	
+	<!-- 根据id查询中间表信息 -->
+	<select id="getItemPaperById" parameterType="Integer" resultType="ItemPaper" >
+		select * from ItemPaper where id=#{id};
+	</select>
+	
+	
+</mapper>

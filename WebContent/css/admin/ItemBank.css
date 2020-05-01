@@ -1,0 +1,63 @@
+#detailContent div{
+	width:100%;
+	padding-left:20px;
+	margin-top:20px;
+	
+}
+#detailContent div span{
+	float:left;
+	font-family: "Î¢ÈíÑÅºÚ";
+	font-weight: bold;;
+}
+#detailContent div p{
+	margin-left:5px;
+	width:90%;
+}
+#detailContent table td{
+	border:1px solid #ccc;
+	width:620px;
+	height:40px;
+	padding-left:20px;
+}
+#detailContent .tong{
+	font-weight: bold;
+	padding-left:30px;
+	width:100px;
+}
+        .a-upload {  
+            padding: 4px 10px;  
+            height: 34px;  
+            line-height: 25px;  
+            position: relative;  
+            cursor: pointer;  
+            color: #888;  
+            background: #fafafa;  
+            border: 1px solid #ddd;  
+            border-radius: 4px;  
+            display: inline-block;  
+            *display: inline;  
+            *zoom: 1 ;
+             color: #fff;
+    		background-color: #337ab7;
+   			border-color: #2e6da4;
+   			cursor: pointer;
+        }  
+        .a-upload  input {  
+            position: absolute;  
+          	width:130px;
+            right: 0;  
+            top: 0;  
+            opacity: 0;  
+            filter: alpha(opacity=0);  
+            cursor: pointer ;
+            color: #fff;
+    		background-color: #337ab7;
+   			border-color: #2e6da4;
+   			cursor: pointer;
+        }  
+        .a-upload:hover {  
+            color: #444;  
+            background: #eee;  
+            border-color: #ccc;  
+            text-decoration: none 
+        }

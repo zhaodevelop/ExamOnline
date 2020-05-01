@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+       "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace的命名空间 -->
+<mapper namespace="com.ruanyuan.mapper.StatisticsMapper">
+
+	<!-- 查询查询全部做题统计 -->
+	<select id="getAllStatistics" resultType="statistics">
+		select * from statistics
+	</select>
+	
+	<!-- 根据id查询 -->
+	<select id="getStatisticsByStatisticsId" parameterType="Integer" resultType="statistics">
+		select * from statistics where statisticsId=#{statisticsId}
+	</select>
+	
+	<!-- 添加做题统计表 -->
+	<insert id="addStatistics" parameterType="statistics">
+		insert into statistics values
+			(null,#{user.userId},#{fraction},#{wrongNumber},#{itemBankIds},#{submissionTime},#{testPaper.tpId})
+	</insert>
+	
+	<!-- 修改做题统计表 -->
+	<update id="updateStatistics" parameterType="statistics">
+	   update statistics 
+	   <set>
+	     <if test="user!=null">
+	        sUserId=#{user.userId},
+	     </if>
+	     <if test="fraction!=null and fraction!=-1 ">
+	        fraction=#{fraction},
+	     </if>
+	     <if test="wrongNumber!=null and wrongNumber!=-1">
+	        wrongNumber=#{wrongNumber},
+	     </if>
+	     <if test="itemBankIds!=null and itemBankIds!=''">
+	        itemBankIds=#{itemBankIds},
+	     </if>
+	     <if test="submissionTime!=null and submissionTime!=''">
+	        submissionTime=#{submissionTime},
+	     </if>
+	     <if test="testPaper!=null">
+	        testPaperId=#{testPaper.tpId},
+	     </if>
+	   </set>
+	   where statisticsId=#{statisticsId}
+	</update>
+	<!-- 删除操作 -->
+	<delete id="deleteStatistics" parameterType="Integer">
+		delete from statistics where statisticsId=#{statisticsId}
+	</delete>
+	
+	<!-- 查询该学生是否已经考试 -->
+	<select id="getStatisticsIsExams" parameterType="Integer" resultType="Integer">
+		SELECT count(*) FROM statistics s JOIN testPaper t 
+			ON s.testPaperId = t.tpId  
+			WHERE s.sUserId = #{userId} 
+			AND t.courseId = #{courseId}
+			AND NOW() BETWEEN t.startTime AND t.endTime 
+	</select>
+	
+	<!-- 根据用户ID 和 试卷ID查询 得分成绩 -->
+	<select id="getFractionByUserIdAndTpId" parameterType="Integer" resultType="Float">
+		SELECT fraction,ABS(NOW() - submissionTime)  AS diffTime FROM statistics ORDER BY diffTime ASC
+			LIMIT 0, 1
+	</select>
+	<!-- 根据试卷id查询统计表 -->
+	<select id="getStatisticsByTestPaperId" parameterType="Integer"
+		resultMap="statisticsMap">
+		SELECT * FROM statistics where testPaperId=#{testPaperId}
+	</select>
+	<resultMap type="statistics" id="statisticsMap">
+		<id property="statisticsId" column="statisticsId" />
+		<result property="fraction" column="fraction" />
+		<result property="wrongNumber" column="wrongNumber" />
+		<result property="itemBankIds" column="itemBankIds" />
+		<result property="submissionTime" column="submissionTime" />
+		<association property="user" javaType="user"
+			column="sUserId" select="com.ruanyuan.mapper.UserMapper.getUserById"></association>
+		<association property="testPaper" javaType="TestPaper"
+			column="testPaperId"
+			select="com.ruanyuan.mapper.TestPaperMapper.getTestPaperById"></association>
+	</resultMap>
+	<!-- 根据试卷id查询统计表 -->
+	<select id="selectStatisticsByTestPaperId" parameterType="Integer"
+		resultMap="statisticsMap">
+		SELECT * FROM statistics where testPaperId=#{testPaperId}
+	</select>
+	<!-- 根据试卷id批量查询统计表 -->
+	<select id="selectStatisticsByTestPaperIds" parameterType="list"
+		resultMap="statisticsMap">
+		SELECT * FROM statistics where testPaperId in 
+		<foreach collection="testPaperIds" item="testPaperId" open="(" separator="," close=")">
+			#{testPaperId}
+		</foreach>
+	</select>
+	<!-- 根据试卷id删除统计信息 -->
+	<delete id="deleteStatisticsByTpId" parameterType="Integer">
+		delete from statistics where testPaperId=#{testPaperId}
+	</delete>
+	<!-- 根据试卷id批量删除统计信息 -->
+	<delete id="deleteStatisticsByTpIds" parameterType="List">
+		delete from statistics where testPaperId in 
+		<foreach collection="testPaperIds" item="testPaperId" open="(" separator="," close=")">
+			#{testPaperId}
+		</foreach>
+	</delete>
+</mapper>

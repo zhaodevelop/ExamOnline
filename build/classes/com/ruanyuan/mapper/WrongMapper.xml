@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruanyuan.mapper.WrongMapper">
+	
+	 <!--SQL片段  -->
+    <sql id="selectStatisticsListWhere">
+        <where>
+	       <if test="tpName != null" >
+	           tpName like "%"#{tpName}"%"
+	       </if>
+	       <if test="submissionTime != null" >
+	        and submissionTime = #{submissionTime}
+	       </if>
+	       
+        </where>
+    </sql>
+	<!-- 多条件查询 -->
+	<select id="getAllItemBank" resultType="Middles">
+	SELECT	statistics.*,testpaper.`tpName` ,user.`userName` FROM statistics
+	LEFT JOIN testpaper ON testpaper.`tpId`=statistics.testPaperid
+	JOIN USER ON user.`userId`=statistics.sUserId
+	<where>
+	sUserId=#{userId} 
+			<choose>
+				<when
+					test="startTime !=null and startTime!='' and endTime !=null and endTime!=''">
+					 and submissionTime BETWEEN #{startTime} AND #{endTime}
+				</when>
+				<when test="startTime !=null and startTime!='' ">
+					 and submissionTime  <![CDATA[>=]]>#{startTime}
+				</when>
+				<when test="endTime !=null and endTime!=''">
+					 and submissionTime  <![CDATA[<=]]>#{endTime}
+				</when>
+			</choose>
+				<if test="tpName!='' and tpName !=null ">
+					and testpaper.tpName LIKE concat('%',#{tpName},'%') 
+				</if>
+		</where>
+		order by submissionTime desc
+		<if test="start !=null and rows !=null">
+			limit #{start},#{rows}
+		</if>
+		
+	</select>
+	
+	<!-- 多条件查询总数 -->
+		<select id="getItemBankCount" resultType="int">
+	SELECT	count(*) FROM statistics
+	LEFT JOIN testpaper ON testpaper.`tpId`=statistics.testPaperid
+	JOIN USER ON user.`userId`=statistics.sUserId
+	<where>
+		sUserId=#{userId} 
+			<choose>
+				<when
+					test="startTime !=null and startTime!='' and endTime !=null and endTime!=''">
+					 and submissionTime BETWEEN #{startTime} AND #{endTime}
+				</when>
+				<when test="startTime !=null and startTime!='' ">
+					 and submissionTime  <![CDATA[>=]]>#{startTime}
+				</when>
+				<when test="endTime !=null and endTime!=''">
+					 and submissionTime  <![CDATA[<=]]>#{endTime}
+				</when>
+			</choose>
+				<if test="tpName!='' and tpName !=null ">
+					and testpaper.tpName LIKE concat('%',#{tpName},'%') 
+				</if>
+			
+		</where>
+		order by submissionTime desc
+	</select>
+	
+<!-- 根据用户ID查询错题 -->
+	<select id="getStatisticsByUserId" parameterType="Integer" resultMap="getStatistics">
+		SELECT * FROM statistics  WHERE  sUserId = #{userId}
+		
+		
+	</select>
+	<!-- 查询做题总数 -->
+	<select id="selectStatisticsMapperListCount" parameterType="statistics" 
+                                                 resultType="Integer">
+		select count(*) from statistics
+		<include refid="selectStatisticsListWhere"/>
+	</select>	
+	
+	<resultMap type="Statistics" id="getStatistics">
+		<id property="statisticsId" column="statisticsId"></id>
+		<result property="fraction" column="fraction" />
+		<result property="wrongNumber" column="wrongNumber" />
+		<result property="itemBankIds" column="itemBankIds" />
+		<result property="submissionTime" column="submissionTime" />
+		<association property="user" javaType="user" column="sUserId"
+		select="com.ruanyuan.mapper.UserMapper.getUserById"></association>
+		<association property="testPaper" javaType="TestPaper" column="testPaperId"
+		select="com.ruanyuan.mapper.TestPaperMapper.getTestPaperById"></association>
+	</resultMap>
+	<!-- 根据错题id查询试题信息 -->
+	<select id="getItemBankByWrongId" resultType="ItemBank">
+		select * from itembank where 
+		ibId in 
+		<foreach collection="ibIds.keys" item="key" open="(" separator="," close=")">
+			#{key}
+		</foreach>
+	</select>
+</mapper>

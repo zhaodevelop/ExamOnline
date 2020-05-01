@@ -1,0 +1,200 @@
+@charset "utf-8";
+/* CSS Document */
+.shang {
+	width: 100%;
+	min-width:1200px;
+	height: 44px;
+}
+
+.shang .dn {
+	width: 85%;
+	height: 44px;
+	margin: 0 auto;
+}
+.shang .dn .z1 {
+	float: left;
+	height: 44px;
+	color: #666;
+	line-height: 44px;
+}
+.shang .dn .z1 a {
+	color: #666;
+	font-size: 13px;
+	padding-right: 6px;
+	padding-left: 6px;
+}
+.shang .dn .z1 a:hover {
+	color: #C60000;
+}
+.shang .dn .y1 {
+	float: right;
+	margin-right: 20px;
+	padding: 13px 0 0;
+}
+.shang .dn .y1 .z2 {
+	float: left;
+	font-size: 13px;
+	margin-right: 10px;
+}
+.shang .dn .y1 .z2 a {
+	color: #666;
+}
+.shang .dn .y1 .z2 span {
+	display: inline-block;
+	padding: 0 1px;
+	background: #fff;
+	color: #e4393c;
+	font-weight: 700;
+	margin-right: 2px;
+}
+.shang .dn .y1 .z2 .jd {
+	display: inline-block;
+	font-style: normal;
+	height: 14px;
+	padding: 1px;
+	line-height: 14px;
+	font-family: arial, simsun;
+	color: #fff;
+	background: #e4393c;
+	margin-left: 6px;
+}
+.shang .dn .y1 .z3 {
+	float: left;
+	margin-right: 10px;
+}
+.shang .dn .y1 .z3 span {
+	font-size: 13px;
+	color: #666;
+}
+.shang .dn .y1 .z3:hover {
+	color: #F00;
+}
+.shang .dn .y1 .z3 .t1 {
+	width: 16px;
+	height: 20px;
+	vertical-align: middle;
+	margin-right: 5px;
+	display: inline-block;
+	background: url(../images/sprite-gys-im.gif) no-repeat;
+}
+.shang .dn .y1 .z4 .t1 {
+	width: 17px;
+	height: 18px;
+	vertical-align: middle;
+	margin-right: 5px;
+	display: inline-block;
+	background: url(../images/__sprite.png) no-repeat;
+	background-position: 0 0;
+	margin-top: -3px;
+}
+.shang .dn .y1 .z5 .t1 {
+	width: 17px;
+	height: 18px;
+	vertical-align: middle;
+	margin-right: 5px;
+	display: inline-block;
+	background: url(../images/__sprite.png) no-repeat;
+	position: relative;
+	top: -3px;
+	width: 16px;
+	background-position: -16px -16px;
+}
+.mb10 {
+    margin-bottom: 10px;
+}
+.border {
+    border: 1px #ddd solid;
+}
+.search-by {
+    padding: 0 20px;
+    width: 95%;
+}
+.relative {
+    position: relative;
+}
+.search-by dl {
+    width: 100%;
+    padding: 10px 0;
+    line-height: 30px;
+    border-bottom: 1px dotted #CCC;
+    overflow: hidden;
+}
+
+.clearfix {
+    zoom: 1;
+}
+.search-by dl dt {
+    text-align: center;
+    margin: 0;
+    font-size: 12px;
+	font-weight: bold;
+}
+.floatLeft {
+    float: left;
+}
+.search-by dl dd {
+    width: 77%;
+    font-size: 12px;
+    height: 30px;
+    overflow: hidden;
+}
+.search-by dl dd a {
+    font-size: 12px;
+    line-height: 30px;
+    margin-left: 20px;
+    display: inline-block;
+	padding-left: 10px;
+    padding-right: 10px;
+}
+
+.search-by .select{
+ 	background: #C60000;
+    font-weight: bold;
+    border-radius: 4px;
+    color: #FFF;
+    text-decoration: none;
+}
+.search-by dl dd.show-more h3 {
+    background: none;
+    border: none;
+    font-size: 12px;
+    line-height: 12px;
+    height: 30px;
+    line-height: 30px;
+}
+.search-by dl dd.show-more h3 i {
+    background: none;
+    float: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 5px;
+}
+.alllist{
+	width:85%;
+	margin: 0 auto;
+	}
+
+.fl_total{
+    color: #999;
+}
+
+.select2{
+	margin-right: 15px;
+    height: 24px;
+    line-height: 24px;
+    display: inline-block;
+    padding-right: 10px;
+    padding-left: 10px;
+    border: 1px solid #d8d8d8;
+    background: #FFF;
+    text-decoration: none;
+	}
+.listtu{
+	height:100%;
+	border: 1px #ddd solid;
+	padding-bottom:20px;
+	}
+.zu ul li{
+	padding: 10px;
+	margin-top: 20px;
+	}

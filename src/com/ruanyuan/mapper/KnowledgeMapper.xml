@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruanyuan.mapper.KnowledgeMapper">
+	<!--SQL片段 -->
+	<sql id="selectKnowledgeListWhere">
+		<where>
+			
+		</where>
+	</sql>
+	<!--根据知识点ID查找知识点 -->
+	<select id="getKnowledgeById" parameterType="Integer"
+		resultMap="KnowledgeById">
+		select * from Knowledge where
+		knowledgeId=#{knowledgeId}
+	</select>
+	<!-- 所需字段与属性映射 -->
+	<resultMap type="Knowledge" id="KnowledgeById">
+		<id property="knowledgeId" column="knowledgeId" />
+		<result property="knowledgeName" column="knowledgeName" />
+		<association property="course" javaType="Course"
+			column="courseId"
+			select="com.ruanyuan.mapper.CourseMapper.getCourseById">
+		</association>
+	</resultMap>
+	<!--根据课程ID查找知识点 -->
+	<select id="getKnowledgeByCourseId" parameterType="Integer"
+		resultType="knowledge">
+		select * from Knowledge where
+		courseId=#{courseId}
+	</select>
+	<!--添加知识点 -->
+	<insert id="addKnowledge" parameterType="Knowledge">
+		insert into
+		Knowledge (knowledgeName,courseId) values
+		(#{knowledgeName},#{course.courseId})
+	</insert>
+	<!--根据知识点ID修改知识点 -->
+	<update id="updateKnowledge" parameterType="knowledge">
+		update
+		knowledge set
+		knowledgeName=#{knowledgeName},courseId=#{course.courseId}
+		where
+		knowledgeId=#{knowledgeId}
+	</update>
+	<!--根据知识点ID删除知识点 -->
+	<delete id="deleteKnowledgeById" parameterType="Knowledge">
+		delete from
+		Knowledge where knowledgeId=#{knowledgeId}
+	</delete>
+	<!-- 查询全部知识点信息 -->
+	<select resultMap="KnowledgeById" id="getKnowledges">
+		select * from Knowledge
+	</select>
+	<!-- 分页查询知识点信息 -->
+	<select id="getKnowledgeByPage" parameterType="KnowledgeVo"
+		resultMap="KnowledgeByPage">
+		SELECT c.courseId,c.fieldId,k.knowledgeId,k.knowledgeName 
+		FROM course c,knowledge k WHERE c.courseId=k.courseId
+		<!-- 当知识点名称不为空时 -->
+		<if test="knowledgeName !=null and knowledgeName != ''">
+			and knowledgeName like concat('%',#{knowledgeName},'%')
+		</if>
+		<!-- 当课程对象不为空时 -->
+		<if test="course !=null">
+			and c.courseId = #{course.courseId}
+		</if>
+		<!-- 当行业对象不为空时 -->
+		<if test="field !=null">
+			and fieldId = #{field.fieldId}
+		</if>
+		<if test="startLine!=null and rows!=null">
+			limit #{startLine},#{rows}
+		</if>
+	</select>
+	<!-- 所需字段与属性映射 -->
+	<resultMap type="KnowledgeVo" id="KnowledgeByPage">
+		<id property="knowledgeId" column="knowledgeId" />
+		<result property="knowledgeName" column="knowledgeName" />
+		<association property="course" javaType="Course"
+			column="courseId"
+			select="com.ruanyuan.mapper.CourseMapper.getCourseById">
+		</association>
+		<association property="field" javaType="Field"
+			column="fieldId"
+			select="com.ruanyuan.mapper.FieldMapper.getFieldById">
+		</association>
+	</resultMap>
+	<!-- 获取知识点总数 -->
+	<select id="getKnowledgeCount" parameterType="KnowledgeVo"
+		resultType="int">
+		select count(*) from course c,knowledge k WHERE c.courseId=k.courseId
+		<!-- 当知识点名称不为空时 -->
+		<if test="knowledgeName !=null and knowledgeName != ''">
+			and knowledgeName like concat('%',#{knowledgeName},'%')
+		</if>
+		<!-- 当课程对象不为空时 -->
+		<if test="course !=null">
+			and c.courseId = #{course.courseId}
+		</if>
+		<!-- 当行业对象不为空时 -->
+		<if test="field !=null">
+			and fieldId = #{field.fieldId}
+		</if>
+	</select>
+	<!-- 根据知识点名称查询知识点信息 -->
+	<select id="getKnowledgeByKnowledgeName" parameterType="String"
+		resultMap="KnowledgeById">
+		select * from knowledge where knowledgeName =
+		#{knowledgeName}
+	</select>
+	<!-- 批量删除知识点信息 -->
+	<delete id="deleteKnowledgeByIds">
+		delete from knowledge where knowledgeId in
+		<foreach collection="list" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	<!-- 根据课程id批量查询知识点信息 -->
+	<select id="getKnowledgeByCourseIds" resultType="Knowledge">
+		select * from knowledge where courseId in
+		<foreach close=")" separator="," open="(" item="ids"
+			collection="array">#{ids} </foreach>
+	</select>
+</mapper>

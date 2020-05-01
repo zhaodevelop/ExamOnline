@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruanyuan.mapper.ItemBankMapper">
+ 	<!--分页查询SQL片段  -->
+    <sql id="selectItemBankListWhere">
+        <where>
+        	<!-- 命题人不为空时 -->
+			<if test="userIds!=null and userIds.size()>0">
+				and itemUser in 
+				<foreach item="userId" collection="userIds" open="(" close=")" separator=",">
+					#{userId}
+				</foreach>
+			</if>
+			<!-- 行业不为空时 -->
+	 		<if test="fieldId !=null and fieldId != ''">
+		 		and fieldId =#{fieldId}
+		 	</if>
+		 	<!-- 课程不为空时 -->
+	 		<if test="courseId !=null and courseId != ''">
+		 		and courseId =#{courseId}
+		 	</if>
+		 	<!-- 知识点不为空时 -->
+	 		<if test="knowledgeId !=null and knowledgeId != ''">
+		 		and knowledgeId =#{knowledgeId}
+		 	</if>
+		 	<!-- 试题不为空时 -->
+	 		<if test="question !=null and question != ''">
+		 		and question like concat('%',#{question},'%')
+		 	</if>
+        </where>
+    </sql>
+ 	<!--根据题库ID查找试题-->
+	<select id="getItemBankById" parameterType="Integer" resultMap="ItemBanks">
+		select * from ItemBank where
+		ibId=#{ibId} 
+	</select>
+	<!--上传试题模板-->
+	<select id="getItemBankTemplate" parameterType="Integer" resultMap="ItemBanks">
+		select * from ItemBank limit 1 
+	</select>
+	 <!--根据试题名称查找试题-->
+	<select id="getItemBankByQuestion" parameterType="String" resultMap="ItemBanks">
+		select * from ItemBank where
+		Question=#{question} 
+	</select>
+	 <!--根据题库试卷中间表ID查找试题-->
+	<select id="getItemBankByPaperId" parameterType="Integer" resultType="ItemBank">
+		select * from ItemBank where
+		ibId=#{ibId} 
+	</select>
+ 	<!--添加题库-->
+	<insert id="addItemBank" parameterType="ItemBank" >
+		insert into  ItemBank(itemUser,Question,optionA,optionB,optionC,optionD,Answer,knowledgeId,fieldId,courseId) values
+		(#{user.userId},#{question},#{optionA},#{optionB},#{optionC},#{optionD},#{Answer},#{knowledge.knowledgeId},#{field.fieldId},#{course.courseId})
+	</insert>	
+	<!-- Excel批量上传添加试题 -->
+	<insert id="insertItemBankBatch" parameterType="java.util.List">
+    insert into  ItemBank (
+		itemUser,Question,optionA,optionB,optionC,optionD,Answer,knowledgeId,fieldId,courseId
+    )
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+	(#{item.user.userId},#{item.question},#{item.optionA},#{item.optionB},#{item.optionC},#{item.optionD}
+	,#{item.Answer},#{item.knowledge.knowledgeId},#{item.field.fieldId},#{item.course.courseId})
+    </foreach>
+	</insert>
+	 <!--根据题库ID修改题库-->
+	<update id="updateItemBank" parameterType="ItemBank" >
+		update ItemBank set 
+		fieldId=#{field.fieldId},
+		courseId=#{course.courseId},
+		knowledgeId=#{knowledge.knowledgeId},
+		Question=#{question},
+		optionA=#{optionA},
+		optionB=#{optionB},
+		optionC=#{optionC},
+		optionD=#{optionD},
+		Answer=#{Answer}  where ibId=#{ibId}
+	</update>	
+	 <!--根据题库ID删除题库-->
+	<delete id="deleteItemBankById" parameterType="ItemBank">
+		delete from ItemBank where ibId=#{ibId}
+	</delete>
+	<!--根据题库ID批量删除试题-->
+	<delete id="deleteItemBankByIds"  parameterType="list" >
+		delete  from ItemBank where ibId in 
+		<!--使用foreach批量删除-->
+		<foreach close=")" separator="," open="(" index="index" item="id" collection="ids">#{id} </foreach>
+	</delete>
+	<select id="getMoreItemBankByIds" resultMap="ItemBanks">
+		select * from ItemBank 
+		<where>
+			<if test="fieldId !=null and fieldId !=''">and fieldId = #{fieldId} </if>
+			<if test="courseId !=null and courseId !=''">and courseId = #{courseId} </if>
+		</where>
+	</select>
+	<!-- 多对多嵌套查询，查询题库信息-->
+	<select id="selectMoreItemBanks"  resultMap="ItemBanks">
+		select * from ItemBank 
+		<include refid="selectItemBankListWhere"/>
+		<!-- 执行分页查询 -->
+		<if test="start !=null and rows != null">
+			limit #{start},#{rows}
+		</if>
+	</select>
+	<!-- 查询分页用户总数 -->
+	<select id="selectItemBankListCount" parameterType="ItemBank"  resultType="Integer">
+		select count(*) from ItemBank
+		<include refid="selectItemBankListWhere"/>
+	</select>
+	
+	<!-- 多条件分页查询所需字段与属性映射 -->
+	<resultMap type="ItemBank" id="ItemBanks">
+		<id  property="ibId" column="ibId"/>
+		<result property="question" column="Question"/>
+		<result property="optionA" column="optionA"/>
+		<result property="optionB" column="optionB"/>
+		<result property="optionC" column="optionC"/>
+		<result property="optionD" column="optionD"/>
+		<result property="Answer" column="Answer"/>
+		<association property="user" javaType="User" column="itemUser" 
+			select="com.ruanyuan.mapper.UserMapper.getUserById">
+		</association>
+		<association property="field" javaType="Field" column="fieldId" 
+			select="com.ruanyuan.mapper.FieldMapper.getFieldById">
+		</association>
+		<association property="course" javaType="Course" column="courseId" 
+			select="com.ruanyuan.mapper.CourseMapper.getCourseById">
+		</association>
+		<association property="knowledge" javaType="Knowledge" column="knowledgeId" 
+			select="com.ruanyuan.mapper.KnowledgeMapper.getKnowledgeById">
+		</association>
+		<!-- 嵌套查询 多对多关联映射  -->
+		<collection property="testPaperList" ofType="TestPaper" column="ibId" 
+		select="com.ruanyuan.mapper.TestPaperMapper.getTestPaperByItemBankId" />
+	</resultMap>
+	<!-- 根据课程id修改题库行业信息 -->
+	<update id="updateItemBankByCourseId" parameterType="Integer" >
+		update ItemBank set 
+		fieldId=#{fieldId} where courseId=#{courseId}	
+	</update>
+	<!-- 根据知识点id修改题库行业和课程 -->
+	<update id="updateItemBankByKnowledgeId" parameterType="Integer" >
+		update ItemBank set 
+		fieldId=#{fieldId},courseId=#{courseId}	where knowledgeId =#{knowledgeId}
+	</update>
+	<!-- 根据行业id查询题库表 -->
+	<select id="getItemBankByFieldId" parameterType="Integer" resultType="ItemBank">
+	select * from ItemBank where fieldId =#{fieldId} </select>
+	<!-- 根据课程id查询题库表 -->
+	<select id="getItemBankByCourseId" parameterType="Integer" resultType="ItemBank">
+	select * from ItemBank where courseId =#{courseId} </select>
+	<!-- 根据知识点id查询题库表 -->
+	<select id="getItemBankByKnowledgeId" parameterType="Integer" resultType="ItemBank">
+	select * from ItemBank where knowledgeId =#{knowledgeId} </select>
+	<!-- 根据行业id批量查询题库信息 -->
+	<select id="getItemBankByFieldIds" resultType="ItemBank">
+	select * from ItemBank where fieldId in 
+	<foreach separator="," close=")" open="(" collection="array" item="ids">#{ids} </foreach>
+	</select>
+	<!-- 根据课程id批量查询题库信息 -->
+	<select id="getItemBankByCourseIds" resultType="ItemBank">
+	select * from ItemBank where courseId in 
+	<foreach separator="," close=")" open="(" collection="array" item="ids">#{ids} </foreach>
+	</select>
+	<!-- 根据知识点id批量查询题库信息 -->
+	<select id="getItemBankByKnowledgeIds" resultType="ItemBank">
+	select * from ItemBank where knowledgeId in 
+	<foreach separator="," close=")" open="(" collection="array" item="ids">#{ids} </foreach>
+	</select>
+</mapper>

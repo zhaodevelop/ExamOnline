@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruanyuan.mapper.CourseMapper">
+	<!--SQL片段 -->
+	<sql id="selectCourseListWhere">
+		<where>
+			<!-- 当课程名称不为空时 -->
+			<if test="courseName !=null and courseName != ''">
+				and courseName like concat('%',#{courseName},'%')
+			</if>
+			<!-- 当行业对象不为空时 -->
+			<if test="field !=null">
+				and fieldId = #{field.fieldId}
+			</if>
+		</where>
+	</sql>
+	<!--根据课程ID查找课程 -->
+	<select id="getCourseById" parameterType="Integer"
+		resultMap="CourseById">
+		select * from Course where
+		CourseId=#{courseId}
+	</select>
+	<!-- 所需字段与属性映射 -->
+	<resultMap type="Course" id="CourseById">
+		<id property="courseId" column="courseId" />
+		<result property="courseName" column="courseName" />
+		<association property="field" javaType="Field"
+			column="fieldId"
+			select="com.ruanyuan.mapper.FieldMapper.getFieldById">
+		</association>
+		<collection property="knowledgeList" ofType="Knowledge"
+			column="courseId"
+			select="com.ruanyuan.mapper.KnowledgeMapper.getKnowledgeByCourseId">
+		</collection>
+	</resultMap>
+	<!--根据行业ID查找课程 -->
+	<select id="getCourseByFieldId" parameterType="Integer"
+		resultMap="courseWithKnow">
+		select * from Course where
+		fieldId =#{fieldId }
+	</select>
+	<!-- 所需字段与属性映射 -->
+	<resultMap type="Course" id="courseWithKnow">
+		<id property="courseId" column="courseId" />
+		<collection property="knowledgeList" ofType="Knowledge"
+			column="courseId"
+			select="com.ruanyuan.mapper.KnowledgeMapper.getKnowledgeByCourseId"></collection>
+	</resultMap>
+	<!--添加课程 -->
+	<insert id="addCourse" parameterType="course">
+		insert into Course
+		(CourseName,fieldId) values
+		(#{courseName},#{field.fieldId})
+	</insert>
+	<!--根据课程ID修改课程 -->
+	<update id="updateCourse" parameterType="course">
+		update Course
+		set CourseName=#{courseName},fieldId=#{field.fieldId}
+		where
+		CourseId=#{courseId}
+	</update>
+	<!--根据课程ID删除课程 -->
+	<delete id="deleteCourseById" parameterType="course">
+		delete from Course
+		where CourseId=#{courseId}
+	</delete>
+	<!-- 获取课程总数 -->
+	<select id="getCourseCount" parameterType="course"
+		resultType="int">
+		select count(*) from course
+		<include refid="selectCourseListWhere" />
+	</select>
+	<!-- 根据课程名称查询课程信息 -->
+	<select id="getCourseByCourseName" parameterType="String"
+		resultMap="CourseById">
+		select * from course where courseName = #{courseName}
+	</select>
+	<!-- 批量删除课程信息 -->
+	<delete id="deleteCourseByIds">
+		delete from course where courseId in
+		<foreach collection="list" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	<!-- 查询全部课程 -->
+	<select resultType="course" id="getCourses">
+		select * from Course
+	</select>
+	<!-- 分页查询课程信息 -->
+	<select id="getCourseByPage" parameterType="course"
+		resultMap="CourseById">
+		select * from course
+		<include refid="selectCourseListWhere" />
+		<if test="startLine!=null and rows!=null">
+			limit #{startLine},#{rows}
+		</if>
+	</select>
+	<!-- 根据行业id批量查询课程信息 -->
+	<select id="getCourseByFieldIds" resultType="course">
+		select * from course where fieldId in
+		<foreach close=")" separator="," open="(" item="ids"
+			collection="array">#{ids} </foreach>
+
+	</select>
+	<!-- 获取所有课程 嵌套结果 -->
+	<select id="getAllCourse" resultMap="courses">
+		select * from Course
+	</select>
+	<!-- 所需字段与属性映射 -->
+	<resultMap type="course" id="courses">
+		<id property="courseId" column="courseId" />
+		<result property="courseName" column="courseName" />
+		<association property="field" javaType="Field">
+			<id property="fieldId" column="fieldId" />
+			<result property="fieldName" column="fieldName" />
+			<result property="introduce" column="introduce" />
+		</association>
+		<collection property="knowledgeList" ofType="KnowledgeList"
+			column="courseId"
+			select="com.ruanyuan.mapper.KnowledgeMapper.getKnowledgeByCourseId"></collection>
+	</resultMap>
+</mapper>

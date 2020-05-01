@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 命名空间-包名+映射文件名 -->
+<mapper namespace="com.ruanyuan.mapper.OperationLogMapper">
+	<!-- 操作日志：添加信息 -->
+	<insert id="addOperationLog" parameterType="operationlog">
+		INSERT INTO OperationLog VALUES
+		(null,#{oTime},#{user.userId},#{content},#{oType})
+	</insert>
+	<!-- 操作日志：修改信息 -->
+	<update id="updateOperationLog" parameterType="operationlog">
+		UPDATE OperationLog 
+		<set>
+			<if test="oTime!=null and oTime!=''">
+				oTime=#{oTime},
+			</if>
+			<if test="user.userId!=null and user.userId!=''">
+				userId=#{user.userId},
+			</if>
+			<if test="content !=null and content !=''">
+				content=#{content},
+			</if>
+			<if test="oType !=null and oType !=''">
+				oType=#{oType},
+			</if>
+		</set>	
+		WHERE oId=#{oId}
+	</update>
+	<!-- 操作日志：删除信息 -->
+	<delete id="deleteOperationLog" parameterType="int">
+		DELETE FROM
+		OperationLog WHERE oId=#{oId}
+	</delete>
+	<!-- 操作日志：查询信息 -->
+	<select id="getOperationLogById" parameterType="int"
+		resultType="operationlog">
+		SELECT * FROM OperationLog WHERE oId=#{oId}
+	</select>
+	<!-- 登录日志：导出用户所有 -->
+	<select id="getOperationLoglByUser" resultType="Middleo">
+		SELECT
+		operationlog.*,user.`userName`,role.roleName FROM operationlog
+		LEFT
+		JOIN USER ON user.`userId`=operationlog.`userId`
+		JOIN role ON
+		user.`userRoleId`=role.roleId
+	</select>
+	<!-- 分页多条件查询(日志时间) -->
+	<select id="getOperationLogs" resultType="Middleo">
+		SELECT operationlog.*,user.`userName`,role.roleName FROM operationlog
+		LEFT JOIN USER ON user.`userId`=operationlog.`userId`
+		JOIN role ON
+		user.`userRoleId`=role.roleId 
+		<where>
+			<choose>
+				<when
+					test="startTime !=null and startTime!='' and endTime !=null and endTime!=''">
+					oTime BETWEEN #{startTime} AND #{endTime} 
+				</when>
+				<when test="startTime !=null and startTime!='' ">
+					oTime  <![CDATA[>=]]>#{startTime} 
+				</when>
+
+				<when test="endTime !=null and endTime!=''">
+					oTime  <![CDATA[<=]]>#{endTime} 
+				</when>
+
+
+			</choose>
+				<if test="userName!='' and userName !=null ">
+				and user.userName LIKE concat('%',#{userName},'%')  </if>
+			<if test="rank!='' and rank !=null ">
+				and role.roleName = #{rank} 
+			</if>
+		</where>
+			 ORDER BY otime DESC
+		<if test="start !=null and rows !=null">
+			limit #{start},#{rows} 
+		</if>
+		
+
+	</select>
+	<!-- 查询登录日志总数 -->
+	<select id="getOperationLogCount" resultType="Integer">
+		select count(*) FROM operationlog
+		LEFT
+		JOIN USER ON user.`userId`=operationlog.`userId`
+		JOIN role ON
+		user.`userRoleId`=role.roleId 
+		<where>
+			<choose>
+				<when
+					test="startTime !=null and startTime!='' and endTime !=null and endTime!=''">
+					oTime BETWEEN #{startTime} AND #{endTime} 
+				</when>
+				<when test="startTime !=null and startTime!='' ">
+					oTime  <![CDATA[>=]]>#{startTime} 
+				</when>
+
+				<when test="endTime !=null and endTime!=''">
+					oTime  <![CDATA[<=]]>#{endTime} 
+				</when>
+			</choose>
+				<if test="userName!='' and userName !=null ">
+				and user.userName LIKE concat('%',#{userName},'%') </if>
+			<if test="rank!='' and rank !=null ">
+				and role.roleName = #{rank} 
+			</if>
+		</where>
+	
+	</select>
+	<!-- 批量删操作日志卷信息 -->
+	<delete id="deleteOperationLogs" parameterType="list">
+		DELETE FROM operationlog WHERE oid in
+		<foreach collection="list" item="oid" open="(" close=")"
+			separator=",">
+			#{oid}
+		</foreach>
+	</delete>
+	<!-- 根据id查询 -->
+	<select id="selectOperaById" resultType="Middleo">
+		SELECT operationlog.*,user.`userName`,role.roleName FROM operationlog
+		LEFT JOIN USER ON user.`userId`=operationlog.`userId`
+		JOIN role ON
+		user.`userRoleId`=role.roleId WHERE oId=#{oId}
+	</select>
+	
+</mapper>

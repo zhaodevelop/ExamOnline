@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruanyuan.mapper.TestPaperMapper">
+	<!-- 添加试卷信息 -->
+	<insert parameterType="TestPaper" id="addTestPaper">
+	insert into testPaper(tpName,fieldId,courseId,number,oneBranch,startTime,endTime,tpTime,totalScore,tpuser)values
+		(#{testPaper.tpName},#{testPaper.field.fieldId},#{testPaper.course.courseId},#{testPaper.number},
+		#{testPaper.oneBranch},#{testPaper.startTime},#{testPaper.endTime},#{testPaper.tpTime},#{testPaper.totalScore},#{testPaper.user.userId})
+	</insert>
+    <!-- 根据试卷id删除试卷信息 -->
+    <delete id="deleteTestPaperById" parameterType="Integer">
+        delete from testPaper
+        where tpId = #{tpId}
+    </delete>
+ <!-- 根据试卷id修改试卷信息 -->
+	<update id="updateTestPaper" parameterType="TestPaper">
+		update testPaper set
+		<if test="testPaper.tpName!=null and testPaper.tpName!=''">
+			tpName=#{testPaper.tpName},
+		</if>
+		<if test="testPaper.field.fieldId !=null and testPaper.field.fieldId!=''">
+			fieldId=#{testPaper.field.fieldId},
+		</if>
+		<if
+			test="testPaper.course.courseId !=null and testPaper.course.courseId!=''">
+			courseId=#{testPaper.course.courseId},
+		</if>
+		<if test="testPaper.number !=null and testPaper.number !=''">
+			number=#{testPaper.number},
+		</if>
+		<if test="testPaper.oneBranch !=null and testPaper.oneBranch!=''">
+			oneBranch=#{testPaper.oneBranch},
+		</if>
+		<if test="testPaper.startTime !=null and testPaper.startTime!=''">
+			startTime=#{testPaper.startTime},
+		</if>
+		<if test="testPaper.endTime !=null and testPaper.endTime!=''">
+			endTime=#{testPaper.endTime},
+		</if>
+		<if test="testPaper.tpTime !=null and testPaper.tpTime!=''">
+			tpTime=#{testPaper.tpTime},
+		</if>
+		<if test="testPaper.totalScore !=null and testPaper.totalScore!=''">
+			totalScore=#{testPaper.totalScore}
+		</if>
+		where tpId=#{testPaper.tpId}
+	</update>
+  	
+	<!-- 跟据试卷id查询试卷信息 -->
+    <select id="getTestPaperById" parameterType="Integer" resultMap="getTestPaper" resultType="TestPaper">
+        select * from testPaper where tpId = #{tpId}
+    </select>
+    <resultMap type="TestPaper" id="getTestPaper">
+		<id property="tpId" column="tpId"/>
+		<result property="tpName" column="tpName" />
+		<result property="number" column="number" />
+		<result property="oneBranch" column="oneBranch" />
+		<result property="startTime" column="startTime" />
+		<result property="endTime" column="endTime" />
+		<result property="tpTime" column="tpTime" />
+		<result property="totalScore" column="TotalScore" />
+		<association property="field" javaType="field" column="fieldId"
+		select="com.ruanyuan.mapper.FieldMapper.getFieldById"></association>
+		<association property="course" javaType="course" column="courseId"
+		select="com.ruanyuan.mapper.CourseMapper.getCourseById"></association>
+		<association property="knowledge" javaType="knowledge" column="knowledgeId"
+		select="com.ruanyuan.mapper.KnowledgeMapper.getKnowledgeById"></association>
+		<association property="user" javaType="user" column="tpUser"
+		select="com.ruanyuan.mapper.UserMapper.getUserById"></association>
+	</resultMap>
+	<!-- 根据试卷名称查询 -->
+	<select id="getTestPaperByName" parameterType="String" resultMap="getTestPaper">
+		select * from testPaper where tpName like concat("%",#{tpName},"%")
+	</select>
+	<!-- 分页多条件查询(试卷名称,行业,课程,试卷创建时间,组卷人) -->
+	<select id="getTestPapers" resultMap="getTestPaper">
+		select * from testPaper
+		<where>
+			<if test="tpName !=null and tpName !='' ">
+				and tpName like concat("%",#{tpName},"%")
+			</if>
+			<if test="fieldId !=null and fieldId != ''">
+				and fieldId =#{fieldId}
+			</if>
+			<!-- 课程不为空时 -->
+			<if test="courseId !=null and courseId != ''">
+				and courseId =#{courseId}
+			</if>
+			<if test="startTime !=null and startTime!=''">
+				and tpTime 
+				<![CDATA[>=]]>
+				#{startTime}
+			</if>
+			<if test="endTime !=null and endTime!=''">
+				and tpTime 
+				<![CDATA[<=]]>
+				#{endTime}
+			</if>
+			<if test="userIdList !=null and userIdList.size()>0">
+				and tpUser in
+				<foreach item="userId" collection="userIdList" open="("
+					close=")" separator=",">
+					#{userId}
+				</foreach>
+			</if>
+		</where>
+		<if test="start !=null and rows !=null">
+			limit #{start},#{rows}
+		</if>
+	</select>
+	<!-- 查询试卷总数 -->
+	<select id="getTestPaperCount" resultType="Integer">
+		select count(*) from testpaper
+		<where>
+			<if test="tpName !=null and tpName !='' ">
+				and tpName like concat("%",#{tpName},"%")
+			</if>
+			<if test="fieldId !=null and fieldId !=''">
+				and fieldId = #{fieldId}
+			</if>
+			<if test="courseId!=null and courseId!=''">
+				and courseId = #{courseId}
+			</if>
+			<if test="startTime !=null and startTime!=''">
+				and tpTime 
+				<![CDATA[>=]]>
+				#{startTime}
+			</if>
+			<if test="endTime !=null and endTime!=''">
+				and tpTime 
+				<![CDATA[<=]]>
+				#{endTime}
+			</if>
+			<if test="userIdList != null and userIdList.size()>0">
+				and tpUser in
+				<foreach item="userId" collection="userIdList" open="("
+					close=")" separator=",">
+					#{userId}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	<!-- 批量删除试卷信息 -->
+	<delete id="deleteMoreTestPaper" parameterType="Integer">
+		DELETE FROM testpaper WHERE tpId in
+		<foreach collection="testPaperIds" item="tpId" open="(" close=")" separator=",">
+			#{tpId}
+		</foreach>
+	</delete>
+	<!-- 根据试卷名称查询 -->
+	<select id="selectTestPaperByName" parameterType="String" resultMap="getTestPaper">
+		select * from testPaper where tpName = #{tpName}
+	</select>
+	<!--根据题库id查询试卷信息列表 -->
+	<select id="getTestPaperByItemBankId" parameterType="Integer" resultType="TestPaper">
+		select * from TestPaper  where tpId	 in (select tpId  from ItemPaper where ibId=#{ibId})
+	</select>
+	<!-- 签到结果 查询试卷及该试卷的试题  resultMap -->
+	<resultMap type="testPaper" id="getTestPaperWithItemBank">
+		<id property="tpId" column="tpId"/>
+		<result property="tpName" column="tpName"/>
+		<result property="field.fieldId" column="fieldId"/>
+		<result property="course.courseId" column="courseId"/>
+		<result property="knowledge.knowledgeId" column="knowledgeId"/>
+		<result property="number" column="number"/>
+		<result property="oneBranch" column="oneBranch"/>
+		<result property="startTime" column="startTime"/>
+		<result property="endTime" column="endTime"/>
+		<result property="tpTime" column="tpTime"/>
+		<result property="totalScore" column="totalScore"/>
+		<result property="user.userId" column="tpUser"/>
+		<association property="user" javaType="User" >
+			<result property="userName" column="userName"/>
+		</association>
+		<collection property="itemBankList" ofType="ItemBank">
+			<id property="ibId" column="ibId"/>
+			<result property="question" column="question"/>
+			<result property="optionA" column="optionA"/>
+			<result property="optionB" column="optionB"/>
+			<result property="optionC" column="optionC"/>
+			<result property="optionD" column="optionD"/>
+			<result property="Answer" column="Answer"/>
+			<result property="knowledge.knowledgeId" column="knowledgeId"/>
+			<association property="user" javaType="User">
+				<result property="userName" column="userName"/>
+			</association>
+		</collection>
+	</resultMap>
+	<!-- 嵌套结果 查询试卷及改试卷的试题 -->
+	<select id="getTestPaperWithItemBank" parameterType="Integer" resultMap="getTestPaperWithItemBank">
+		SELECT tp.*,ib.*,ip.*,u.userName 
+			FROM itemBank ib JOIN itemPaper ip ON ib.ibId=ip.ibId  
+				JOIN testPaper tp ON tp.tpId=ip.tpId  
+				JOIN USER u ON tp.tpUser=u.userId 
+				WHERE ip.tpId=#{tpId}
+				AND  tp.courseId=#{courseId}
+				AND NOW() BETWEEN tp.startTime AND tp.endTime;
+	</select>
+	
+	<!-- 根据行业ID和 目前时间获取试卷ID -->
+	<select id="getTestPaperIdByNowTime" parameterType="Integer" resultType="Integer">
+		select tpId from testPaper where courseId=#{courseId} AND NOW() between startTime and endTime;
+	</select>
+	<!-- 获取试卷总数 -->
+	<select id="getTestPaperByNowTime" parameterType="Integer" resultType="testPaper">
+		select * from testPaper where courseId=#{courseId} AND NOW() between startTime and endTime;
+	</select>
+	
+	<!-- 根据行业id查询试卷信息 -->
+	<select id="getTestPaperByFieldId" parameterType="Integer" resultType="testPaper">
+		select * from testPaper where
+		fieldId	=#{fieldId} 
+	</select>
+	<!-- 根据课程id查询试卷信息 -->
+	<select id="getTestPaperByCourseId" parameterType="Integer" resultType="testPaper">
+		select * from testPaper where
+		courseId =#{courseId} 
+	</select>
+	<!-- 根据知识点id查询试卷信息 -->
+	<select id="getTestPaperByKnowledgeId" parameterType="Integer" resultType="testPaper">
+		select * from testPaper where
+		knowledgeId	=#{knowledgeId} 
+	</select>
+	<!-- 根据行业id批量查询试卷信息 -->
+	<select id="getTestPaperByFieldIds" resultType="testPaper">
+		select * from testPaper where fieldId in
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</select>
+	<!-- 根据课程id批量查询试卷信息 -->
+	<select id="getTestPaperByCourseIds" resultType="testPaper">
+		select * from testPaper where courseId in
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</select>
+	<!-- 根据知识点id批量查询试卷信息 -->
+	<select id="getTestPaperByKnowledgeIds" resultType="testPaper">
+		select * from testPaper where knowledgeId in
+		<foreach collection="array" item="ids" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</select>
+	<!-- 获取试卷总数根据课程ID-->
+	<select id="getTestPaperByCouseId" parameterType="Integer" resultType="testPaper">
+		select * from testPaper where courseId=#{courseId} and now() &lt; startTime AND startTime &lt; endTime
+	</select>
+</mapper>
