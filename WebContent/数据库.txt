@@ -1,0 +1,288 @@
+#创建库
+CREATE DATABASE IF NOT EXISTS  Examination CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE Examination;
+#角色表
+CREATE TABLE IF NOT EXISTS  role(		
+roleId		INT		NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "角色ID",
+roleName	VARCHAR(50)	NOT NULL 	COMMENT "角色名称"
+)ENGINE=INNODB;
+#用户表
+CREATE TABLE IF NOT EXISTS  USER(		
+userId		INT		NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "用户ID",
+userName	VARCHAR(50)	NOT NULL 	COMMENT "用户名称",
+account 	VARCHAR(100)	NOT NULL 	COMMENT "账号",
+PASSWORD	VARCHAR(100)	NOT NULL 	COMMENT "密码",
+sex		CHAR				COMMENT "性别",
+phone		VARCHAR(100)			COMMENT "电话",
+address		VARCHAR(200)			COMMENT "联系地址",
+email		VARCHAR(100)			COMMENT "邮箱",
+headimg		VARCHAR(100)	DEFAULT 'images/default.jpg'		COMMENT "用户头像",
+userRoleId	INT				COMMENT "角色ID",
+FOREIGN KEY(userRoleId) REFERENCES role(roleID)
+)ENGINE=INNODB;
+#行业表
+CREATE TABLE IF NOT EXISTS  FIELD(		
+fieldId 	INT		NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "行业ID",
+fieldName	VARCHAR(200)	NOT NULL 	COMMENT "行业名称",
+introduce	VARCHAR(200)			COMMENT "行业介绍"
+)ENGINE=INNODB;
+
+
+#课程表
+CREATE TABLE IF NOT EXISTS  Course(		
+courseId		INT		NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "课程ID",
+courseName	VARCHAR(200)	NOT NULL 	COMMENT "课程名称",
+fieldId		INT		NOT NULL	COMMENT "行业ID",
+FOREIGN KEY(fieldID) REFERENCES FIELD(fieldID) ON UPDATE CASCADE
+)ENGINE=INNODB;
+#知识点表
+CREATE TABLE IF NOT EXISTS  knowledge(		
+knowledgeId	INT		NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "知识点ID",
+knowledgeName	VARCHAR(200)	NOT NULL 	COMMENT "知识点名称",
+courseId	INT		NOT NULL	COMMENT "课程ID",
+FOREIGN KEY(CourseId) REFERENCES  Course(CourseId) ON UPDATE CASCADE
+)ENGINE=INNODB;
+#题库表
+CREATE TABLE IF NOT EXISTS  ItemBank(		
+ibId		INT		NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "试题ID",
+itemUser	INT		NOT NULL 	COMMENT "命题人",
+Question	VARCHAR(500)	NOT NULL 	COMMENT "试题",
+optionA		VARCHAR(100)	NOT NULL 	COMMENT "选项A",
+optionB		VARCHAR(100)	NOT NULL 	COMMENT "选项B",
+optionC		VARCHAR(100)	NOT NULL 	COMMENT "选项C",
+optionD		VARCHAR(100)	NOT NULL 	COMMENT "选项D",
+Answer		VARCHAR(100)	NOT NULL 	COMMENT "答案",
+fieldId 	INT		NOT NULL 	COMMENT "行业id",
+courseId	INT		NOT NULL 	COMMENT "课程id",
+knowledgeId	INT		NOT NULL 	COMMENT "知识点id",
+FOREIGN KEY(itemUser) REFERENCES USER(userID) ,
+FOREIGN KEY(fieldId) REFERENCES FIELD(fieldID) ON UPDATE CASCADE,
+FOREIGN KEY(courseId) REFERENCES Course(CourseId) ON UPDATE CASCADE ,
+FOREIGN KEY(knowledgeID) REFERENCES knowledge(knowledgeID) ON UPDATE CASCADE
+)ENGINE=INNODB;
+
+
+
+
+
+#试卷表
+CREATE TABLE IF NOT EXISTS  testPaper(		
+tpId		INT		NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "试卷ID",
+tpName		VARCHAR(100)	NOT NULL 	COMMENT "试卷名称",
+fieldId 	INT		NOT NULL 	COMMENT "试卷类别",
+courseId	INT		NOT NULL 	COMMENT "课程id",
+knowledgeId	INT				COMMENT "知识点id",
+number		INT		NOT NULL 	COMMENT "试题数量",
+oneBranch	FLOAT		NOT NULL 	COMMENT "单个题的分数",
+startTime	DATETIME   	NOT NULL 	COMMENT "答题开始时间",
+endTime		DATETIME 	NOT NULL 	COMMENT "答题结束时间",
+tpTime		VARCHAR(100)	NOT NULL 	COMMENT "试卷生成时间",
+TotalScore	FLOAT				COMMENT "总分",
+tpUser		INT				COMMENT "组卷人",
+FOREIGN KEY(fieldID) REFERENCES FIELD(fieldID),
+FOREIGN KEY(CourseId) REFERENCES Course(CourseId),
+FOREIGN KEY(knowledgeID) REFERENCES knowledge(knowledgeID),
+FOREIGN KEY(tpUser) REFERENCES USER(userID)
+)ENGINE=INNODB;
+
+
+
+
+
+#题库试卷中间关系表
+CREATE TABLE IF NOT EXISTS  ItemPaper(		
+id		INT		NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "关系id",
+ibId		INT		NOT NULL 	COMMENT "题库表ID",
+tpId		INT		NOT NULL 	COMMENT "试卷表ID",
+FOREIGN KEY(ibId) REFERENCES ItemBank(ibId),
+FOREIGN KEY(tpId) REFERENCES testPaper(tpId)
+)ENGINE=INNODB;
+
+#做题统计表
+CREATE TABLE IF NOT EXISTS  Statistics(		
+statisticsId	INT 		NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT "统计ID",
+sUserId		INT     	NOT NULL 	COMMENT "用户ID",
+fraction	FLOAT   	NOT NULL 	COMMENT "分数",
+wrongNumber	INT    		NOT NULL 	COMMENT "错题数",
+itemBankIds	VARCHAR(1000)			COMMENT "错题ID",
+submissionTime	DATETIME    	NOT NULL 	COMMENT "提交日期",
+testPaperId	INT 		NOT NULL 	COMMENT "试卷ID",
+FOREIGN KEY(sUserId) REFERENCES USER(userID),
+FOREIGN KEY(testPaperId) REFERENCES testPaper(tpId)
+)ENGINE=INNODB;
+
+
+#登录日志
+CREATE TABLE Journal(
+jId 	INT 	 	NOT NULL 		PRIMARY KEY AUTO_INCREMENT,
+userId	INT  		NOT NULL  		COMMENT "用户ID",
+jTime    DATETIME 	DEFAULT CURRENT_TIMESTAMP COMMENT "登录时间",
+ip      VARCHAR(200) 	COMMENT "登录ip",
+FOREIGN KEY(userId) REFERENCES USER(userId)
+)ENGINE=INNODB; 
+
+
+
+
+#操作日志
+CREATE TABLE OperationLog(
+oId	INT 	 	NOT NULL 		PRIMARY KEY AUTO_INCREMENT,
+oTime	TIMESTAMP 	DEFAULT 	CURRENT_TIMESTAMP ,
+userId    INT ,
+content VARCHAR(1000),
+oType   	VARCHAR(10),
+FOREIGN KEY(userId) REFERENCES USER(userId)
+)ENGINE=INNODB;
+
+
+#角色表插入数据
+INSERT INTO role VALUES
+(NULL,"管理员"),
+(NULL,"员工");
+
+#用户表插入数据
+INSERT INTO USER VALUES
+(NULL,'张三','admin',MD5('admin'),'男','15332165410','河北石家庄','191@qq.com',DEFAULT,1),
+(NULL,'李四','admin1',MD5('admin1'),'女','15332165410','河北石家庄','191@qq.com',DEFAULT,2),
+(NULL,'王五','admin2',MD5('admin2'),'男','15332165410','河北石家庄','191@qq.com',DEFAULT,1),
+(NULL,'赵六','admin3',MD5('admin3'),'女','15332165410','河北石家庄','191@qq.com',DEFAULT,1);
+
+
+
+#行业表插入数据
+INSERT INTO FIELD VALUES
+(NULL,"计算机","计算机知识"),
+(NULL,"建筑类","建筑知识"),
+(NULL,"商业","商业知识"),
+(NULL,"餐饮","餐饮知识"),
+(NULL,"酒店","酒店知识");
+
+
+#课程表插入数据
+INSERT INTO course VALUES
+(DEFAULT,"Java大数据",1),
+(DEFAULT,"python",1),
+(DEFAULT,"ps",1),
+(DEFAULT,"图纸设计",2),
+(DEFAULT,"商品价值",3),
+(DEFAULT,"餐饮管理",4),
+(DEFAULT,"酒店管理",5);
+#知识点表插入数据
+INSERT INTO knowledge VALUES
+(DEFAULT,"map集合的使用",1),
+(DEFAULT,"集合的使用",1),
+(DEFAULT,"list集合的使用",1),
+(DEFAULT,"python使用",2),
+(DEFAULT,"ps使用",3),
+(DEFAULT,"图纸基本要素",4),
+(DEFAULT,"图纸类型介绍",4),
+(DEFAULT,"价值概述",5),
+(DEFAULT,"价值历史",5),
+(DEFAULT,"价值含义",5),
+(DEFAULT,"餐饮礼仪",6),
+(DEFAULT,"酒店卫生",7);
+
+
+#题库表插入数据
+INSERT INTO ItemBank VALUES
+(DEFAULT,1,"arrayList的正确的是使用?","dadd","fwf","wew","dawfw","A",1,1,1),
+(DEFAULT,1,"Map的正确的是使用?","dadd","fwf","wew","dawfw","B",1,1,1),
+(DEFAULT,1,"List的正确的是使用?","dadd","fwf","wew","dawfw","C",1,1,1);
+
+
+#试卷表插入数据
+INSERT INTO testpaper VALUES
+(NULL,'期末试卷','1','1','1','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','3'),
+(NULL,'期中试卷','1','1','2','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','4'),
+(NULL,'期末试卷','1','1','3','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','3'),
+(NULL,'期中试卷','1','2','4','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','4'),
+(NULL,'期末试卷','1','3','5','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','3'),
+(NULL,'期中试卷','2','4','6','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','4'),
+(NULL,'期末试卷','2','4','7','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','3'),
+(NULL,'期中试卷','3','5','8','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','4'),
+(NULL,'期末试卷','3','5','9','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','3'),
+(NULL,'期中试卷','3','5','10','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','4'),
+(NULL,'期末试卷','4','6','11','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','3'),
+(NULL,'期末试卷','5','7','12','20','5','2020-03-14 10:00:00','2020-03-14 12:00:00','2020-03-14 09:00:00','100','4');
+#中间表
+INSERT INTO `itempaper` (`id`, `ibId`, `tpId`) VALUES(DEFAULT,'1','1');
+INSERT INTO `itempaper` (`id`, `ibId`, `tpId`) VALUES(DEFAULT,'2','1');
+INSERT INTO `itempaper` (`id`, `ibId`, `tpId`) VALUES(DEFAULT,'2','1');
+#做题统计表插入数据
+INSERT INTO statistics VALUES
+(DEFAULT,1,68,3,'1:D,2:D,3:D','2020-01-01 10:10:10',1),
+(DEFAULT,2,40,3,'1:D,2:D,3:D','2019-11-11 10:10:10',3),
+(DEFAULT,1,88,1,'1:B','2019-05-01 10:10:10',5),
+(DEFAULT,2,28,3,'1:C,2:C,3:D','2020-01-01 10:10:10',7),
+(DEFAULT,1,50,3,'1:C,2:C,3:D','2019-11-11 10:10:10',6),
+(DEFAULT,2,58,1,'1:C','2019-05-01 10:10:10',8),
+(DEFAULT,1,38,3,'1:C,2:C,3:D','2020-01-01 10:10:10',10),
+(DEFAULT,2,90,3,'1:C,2:C,3:D','2019-11-11 10:10:10',4),
+(DEFAULT,1,78,3,'1:C,2:C,3:D','2020-01-01 10:10:10',2),
+(DEFAULT,2,70,3,'1:C,2:C,3:D','2019-11-11 10:10:10',10),
+(DEFAULT,1,78,3,'1:C,2:C,3:D','2020-01-01 10:10:10',8),
+(DEFAULT,2,67,3,'1:C,2:C,3:D','2019-11-11 10:10:10',9),
+(DEFAULT,1,90,3,'1:D,2:D,3:D','2019-11-11 10:10:10',9),
+(DEFAULT,2,78,3,'1:D,2:D,3:D','2020-01-01 10:10:10',5),
+(DEFAULT,1,50,3,'1:D,2:D,3:D','2019-11-11 10:10:10',4),
+(DEFAULT,2,78,3,'1:D,2:D,3:D','2020-01-01 10:10:10',6),
+(DEFAULT,1,80,2,'1:D,2:D','2020-01-01 10:10:10',11),
+(DEFAULT,2,75,2,'1:D,2:D','2020-01-01 10:10:10',12),
+(DEFAULT,1,67,3,'1:D,2:D,3:D','2019-11-11 10:10:10',3);
+
+
+
+#登录日志插入数据
+INSERT INTO journal VALUES
+(NULL,1,NOW(),'192.168.3.2'),
+(NULL,1,NOW(),'192.188.2.3'),
+(NULL,1,NOW(),'192.178.2.3');
+
+#操作日志插入数据
+INSERT INTO OperationLog VALUES
+(NULL,NOW(),1,'啧啧','修改'),
+(NULL,NOW(),1,'额啧','增加'),
+(NULL,NOW(),1,'额额','查询');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*#课程表插入数据
+INSERT INTO course VALUES
+(DEFAULT,"Java大数据",1),
+(DEFAULT,"python",1),
+(DEFAULT,"ps",1),
+(DEFAULT,"工程应用",2),
+(DEFAULT,"工程管理",2);
+
+#知识点表插入数据
+INSERT INTO knowledge VALUES
+(DEFAULT,"map集合的使用",1),
+(DEFAULT,"集合的使用",1),
+(DEFAULT,"list集合的使用",1);*/
+
+
+
+
+/*insert into user(userId,userName,account,passWord) values
+(default,"zhang","zhangsan","123");
+insert into field values
+(default,"计算机",null);
+insert into course values
+(default,"Java大数据",1),
+(default,"python",1);
+insert into knowledge values
+(default,"map集合的使用",1);
+insert into ItemBank values
+(default,1,"arrayList的正确的是使用?","dadd","fwf","wew","dawfw","A",1);
+select * from ItemBank where ibId=1*/
